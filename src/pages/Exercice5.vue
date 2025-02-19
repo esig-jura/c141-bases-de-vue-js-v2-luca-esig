@@ -9,7 +9,7 @@
         <v-card-title>Saisie surveillée</v-card-title>
 
         <v-card-text>
-          <v-alert type="success" class="mb-2">
+          <v-alert v-if="containsPokemon" type="success" class="mb-2">
             Vous avez mentionné "Pokémon" !
           </v-alert>
 
@@ -22,7 +22,7 @@
 
           <v-card-subtitle>
             Nombre de caractères :
-            *** CARACTÈRES SAISIS ***
+            {{userInput.length}}
           </v-card-subtitle>
         </v-card-text>
       </v-card>
@@ -34,7 +34,7 @@
 // Importation du composant contenant la donnée de l'exerciced
 import ExerciceObjectifs from "@/components/ExerciceObjectifs.vue";
 // Importation de la fonction réactive ref
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 // Variable réactive pour la saisie utilisateur
 const userInput = ref('');
@@ -44,4 +44,23 @@ const MAX_LENGTH = 20;
 
 // Variable réactive pour indiquer si "Pokémon" est présent
 const containsPokemon = ref(false);
+
+watch(userInput, (newUserInput) => {
+  // oui, console.log() est un effet de bord
+  (`nombre de caractère: ${newUserInput.length}`);
+
+
+
+})
+// Watcher pour surveiller les changements de userInput
+watch(userInput, (newUserInput) => {
+  // Vérification si le texte contient "Pokémon" (sans tenir compte de la casse)
+  containsPokemon.value = newUserInput.toLowerCase().includes("pokémon");
+
+  // Réinitialisation si la longueur dépasse la limite
+  if (newUserInput.length > MAX_LENGTH) {
+    userInput.value = "";
+  }
+})
+
 </script>

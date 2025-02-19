@@ -12,33 +12,35 @@
         <v-text-field
           label="Nouvelle tâche"
           clearable
+          v-model="newTask"
+          @keyup.enter="addTask"
         >
           <template v-slot:append-inner>
-            <v-btn>Ajouter</v-btn>
+            <v-btn @click="addTask">Ajouter</v-btn>
           </template>
         </v-text-field>
 
         <v-card-title>Liste des tâches</v-card-title>
 
-        <v-card-subtitle>
+        <v-card-subtitle v-if="tasks.length<1">
           Il n'y a pas de tâches... chanceux ! 😄
         </v-card-subtitle>
 
-        <v-list>
+        <v-list  v-for="t in sortTasks  " :key="t.date">
           <v-list-item>
             <template v-slot:prepend>
               <v-list-item-action start>
-                <v-checkbox-btn />
+                <v-checkbox-btn v-model="t.completed"/>
               </v-list-item-action>
             </template>
 
-            <v-list-item-title>
-              *** Titre de la tâche ***
+            <v-list-item-title :class="{done : t.completed}">
+              {{ t.title }}
             </v-list-item-title>
 
             <v-list-item-subtitle>
-              Créé le *** Date ***
-              à *** Heure ***
+              Créé le {{ new Date(t.date).toLocaleDateString() }}
+              à {{ new Date(t.date).toLocaleTimeString() }}
             </v-list-item-subtitle>
           </v-list-item>
         </v-list>
@@ -51,7 +53,7 @@
 // Importation du composant ExerciceObjectifs
 import ExerciceObjectifs from "@/components/ExerciceObjectifs.vue";
 // Importation de la fonction réactive ref
-import {ref} from 'vue';
+import {computed, ref, watch} from 'vue';
 
 // Tableau réactif de tâches
 const tasks = ref([
@@ -73,6 +75,12 @@ const tasks = ref([
 ]);
 // Nouvelle tâche à ajouter
 const newTask = ref("*** Nouvelle tâche ***");
+//propiété calculé qui trié les tachs par date de création
+
+const sortTasks = computed (function () {
+  return [...tasks.value].sort((a, b) => b.date - a.date);
+})
+
 
 /**
  * Fonction qui ajoute une nouvelle tâche à la liste.
@@ -87,8 +95,25 @@ function addTask () {
   // Réinitialisation de la saisie
   newTask.value = "";
 }
+
+//watcher qui écoute pour supprimer les tâches
+
+watch (newTask,(newVal, oldVal)=>{
+  console.log('new:',newVal, 'old:',oldVal);//sers a rien quoi
+  if (newVal.toLowerCase()=== 'delete') {
+    tasks.value = [];
+    newTask.value = "";
+  }
+})
+
+
+
 </script>
 
-<style scoped lang="sass">
+<style scoped lang="css">
+
+.done{
+  text-decoration: line-through;
+}
 
 </style>
